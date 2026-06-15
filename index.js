@@ -23,23 +23,20 @@ app.post('/evaluate', upload.single('file'), async (req, res) => {
 
     let messages = [];
 
-    if (req.file) {
-      const fileBuffer = fs.readFileSync(req.file.path);
-      const base64 = fileBuffer.toString('base64');
-      const mediaType = req.file.mimetype;
+   const pdfBase64 = req.body.pdfBase64 || '';
+
+    if (pdfBase64) {
       const userText = lang === 'sq'
-        ? 'Vlerëso këtë plan mësimor nga skedari i bashkangjitur.'
-        : 'Evaluate this lesson plan from the attached file.';
+        ? 'Vlerëso këtë plan mësimor nga skedari PDF.'
+        : 'Evaluate this lesson plan from the attached PDF.';
 
       messages = [{
         role: 'user',
         content: [
-          { type: 'document', source: { type: 'base64', media_type: mediaType, data: base64 } },
+          { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: pdfBase64 } },
           { type: 'text', text: userText }
         ]
       }];
-
-      fs.unlinkSync(req.file.path);
     } else {
       const userPrompt = lang === 'sq'
         ? `Vlerëso këtë plan mësimor:\n\n${text}`
